@@ -1,10 +1,10 @@
 {% include "header.stencil" %}
 import UIKit
 
-public extension LabelStyle {
+public extension TextStyle {
     {% for style in styles %}
-    static func {{ style.varName }}() -> LabelStyle {
-        LabelStyle(
+    static func {{ style.varName }}() -> TextStyle {
+        TextStyle(
             font: UIFont.{{ style.varName }}(){% if style.supportsDynamicType %},
             fontMetrics: UIFontMetrics(forTextStyle: .{{ style.type }}){% endif %}{% if style.lineHeight != 0 %},
             lineHeight: {{ style.lineHeight }}{% endif %}{% if style.tracking != 0 %},

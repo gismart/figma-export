@@ -117,7 +117,7 @@ ios:
     # [optional] Absolute or relative path to swift file where to export UIKit fonts (UIFont extension).
     fontSwift: "./Source/UIComponents/UIFont+extension.swift"
     # [optional] Absolute or relative path to swift file where to generate LabelStyle extensions for each style (LabelStyle extension).
-    labelStyleSwift: "./Source/UIComponents/LabelStyle+extension.swift"
+    labelStyleSwift: "./Source/UIComponents/TextStyle+extension.swift"
     # [optional] Absolute or relative path to swift file where to export SwiftUI fonts (Font extension).
     swiftUIFontSwift: "./Source/View/Common/Font+extension.swift"
     # Should FigmaExport generate UILabel for each text style (font)? E.g. HeaderLabel, BodyLabel, CaptionLabel

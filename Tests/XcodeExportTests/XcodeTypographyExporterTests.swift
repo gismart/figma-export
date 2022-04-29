@@ -271,7 +271,7 @@ final class XcodeTypographyExporterTests: XCTestCase {
         let fontUrls = XcodeTypographyOutput.FontURLs()
         let labelUrls = XcodeTypographyOutput.LabelURLs(
             labelsDirectory: URL(string: "~/")!,
-            labelStyleExtensionsURL: URL(string: "~/LabelStyle+extension.swift")!
+            labelStyleExtensionsURL: URL(string: "~/TextStyle+extension.swift")!
         )
         let urls = XcodeTypographyOutput.URLs(
             fonts: fontUrls,
@@ -299,7 +299,7 @@ final class XcodeTypographyExporterTests: XCTestCase {
 
         public class Label: UILabel {
 
-            var style: LabelStyle? { nil }
+            var style: TextStyle? { nil }
 
             public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
                 super.traitCollectionDidChange(previousTraitCollection)
@@ -362,47 +362,47 @@ final class XcodeTypographyExporterTests: XCTestCase {
 
         public final class LargeTitleLabel: Label {
 
-            override var style: LabelStyle? {
+            override var style: TextStyle? {
                 .largeTitle()
             }
         }
         
         public final class TitleSectionLabel: Label {
 
-            override var style: LabelStyle? {
+            override var style: TextStyle? {
                 .titleSection()
             }
         }
         
         public final class HeaderLabel: Label {
 
-            override var style: LabelStyle? {
+            override var style: TextStyle? {
                 .header()
             }
         }
 
         public final class BodyLabel: Label {
 
-            override var style: LabelStyle? {
+            override var style: TextStyle? {
                 .body()
             }
         }
 
         public final class CaptionLabel: Label {
 
-            override var style: LabelStyle? {
+            override var style: TextStyle? {
                 .caption()
             }
         }
 
         """
         
-        let contentsLabelStyle = """
+        let contentsTextStyle = """
         \(header)
 
         import UIKit
         
-        public struct LabelStyle {
+        public struct TextStyle {
 
             enum TextCase {
                 case uppercased
@@ -479,38 +479,38 @@ final class XcodeTypographyExporterTests: XCTestCase {
         
         import UIKit
         
-        public extension LabelStyle {
+        public extension TextStyle {
             
-            static func largeTitle() -> LabelStyle {
-                LabelStyle(
+            static func largeTitle() -> TextStyle {
+                TextStyle(
                     font: UIFont.largeTitle(),
                     fontMetrics: UIFontMetrics(forTextStyle: .largeTitle)
                 )
             }
             
-            static func titleSection() -> LabelStyle {
-                LabelStyle(
+            static func titleSection() -> TextStyle {
+                TextStyle(
                     font: UIFont.titleSection(),
                     textCase: .uppercased
                 )
             }
             
-            static func header() -> LabelStyle {
-                LabelStyle(
+            static func header() -> TextStyle {
+                TextStyle(
                     font: UIFont.header()
                 )
             }
             
-            static func body() -> LabelStyle {
-                LabelStyle(
+            static func body() -> TextStyle {
+                TextStyle(
                     font: UIFont.body(),
                     fontMetrics: UIFontMetrics(forTextStyle: .body),
                     tracking: 1.2
                 )
             }
             
-            static func caption() -> LabelStyle {
-                LabelStyle(
+            static func caption() -> TextStyle {
+                TextStyle(
                     font: UIFont.caption(),
                     fontMetrics: UIFontMetrics(forTextStyle: .footnote),
                     lineHeight: 20.0
@@ -534,25 +534,25 @@ final class XcodeTypographyExporterTests: XCTestCase {
             )
         )
         
-        // LabelStyle.swift
+        // TextStyle.swift
         XCTAssertNoDifference(
             files[1],
             FileContents(
                 destination: Destination(
                     directory: URL(string: "~/")!,
-                    file: URL(string: "LabelStyle.swift")!
+                    file: URL(string: "TextStyle.swift")!
                 ),
-                data: contentsLabelStyle.data(using: .utf8)!
+                data: contentsTextStyle.data(using: .utf8)!
             )
         )
         
-        // LabelStyle+extension.swift
+        // TextStyle+extension.swift
         XCTAssertNoDifference(
             files[2],
             FileContents(
                 destination: Destination(
                     directory: URL(string: "~/")!,
-                    file: URL(string: "LabelStyle+extension.swift")!
+                    file: URL(string: "TextStyle+extension.swift")!
                 ),
                 data: styleExtensionContent.data(using: .utf8)!
             )
@@ -590,7 +590,7 @@ final class XcodeTypographyExporterTests: XCTestCase {
 
         public class Label: UILabel {
 
-            var style: LabelStyle? { nil }
+            var style: TextStyle? { nil }
 
             public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
                 super.traitCollectionDidChange(previousTraitCollection)
@@ -653,8 +653,8 @@ final class XcodeTypographyExporterTests: XCTestCase {
 
         public final class LargeTitleLabel: Label {
 
-            override var style: LabelStyle? {
-                LabelStyle(
+            override var style: TextStyle? {
+                TextStyle(
                     font: UIFont.largeTitle(),
                     fontMetrics: UIFontMetrics(forTextStyle: .largeTitle)
                 )
@@ -663,8 +663,8 @@ final class XcodeTypographyExporterTests: XCTestCase {
 
         public final class TitleSectionLabel: Label {
 
-            override var style: LabelStyle? {
-                LabelStyle(
+            override var style: TextStyle? {
+                TextStyle(
                     font: UIFont.titleSection(),
                     textCase: .uppercased
                 )
@@ -673,8 +673,8 @@ final class XcodeTypographyExporterTests: XCTestCase {
 
         public final class HeaderLabel: Label {
 
-            override var style: LabelStyle? {
-                LabelStyle(
+            override var style: TextStyle? {
+                TextStyle(
                     font: UIFont.header()
                 )
             }
@@ -682,8 +682,8 @@ final class XcodeTypographyExporterTests: XCTestCase {
 
         public final class BodyLabel: Label {
 
-            override var style: LabelStyle? {
-                LabelStyle(
+            override var style: TextStyle? {
+                TextStyle(
                     font: UIFont.body(),
                     fontMetrics: UIFontMetrics(forTextStyle: .body),
                     tracking: 1.2
@@ -693,23 +693,22 @@ final class XcodeTypographyExporterTests: XCTestCase {
 
         public final class CaptionLabel: Label {
 
-            override var style: LabelStyle? {
-                LabelStyle(
+            override var style: TextStyle? {
+                TextStyle(
                     font: UIFont.caption(),
                     fontMetrics: UIFontMetrics(forTextStyle: .footnote),
                     lineHeight: 20.0
                 )
             }
         }
-
         """
         
-        let contentsLabelStyle = """
+        let contentsTextStyle = """
         \(header)
 
         import UIKit
         
-        public struct LabelStyle {
+        public struct TextStyle {
 
             enum TextCase {
                 case uppercased
@@ -782,7 +781,7 @@ final class XcodeTypographyExporterTests: XCTestCase {
         """
         
         XCTAssertEqual(files.count, 2, "Must be generated 2 files but generated \(files.count)")
-        
+        let stringValue = String(data: files[0].data!, encoding: .utf8)
         XCTAssertNoDifference(
             files[0],
             FileContents(
@@ -799,9 +798,9 @@ final class XcodeTypographyExporterTests: XCTestCase {
             FileContents(
                 destination: Destination(
                     directory: URL(string: "~/")!,
-                    file: URL(string: "LabelStyle.swift")!
+                    file: URL(string: "TextStyle.swift")!
                 ),
-                data: contentsLabelStyle.data(using: .utf8)!
+                data: contentsTextStyle.data(using: .utf8)!
             )
         )
     }

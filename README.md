@@ -191,12 +191,12 @@ If name of an image contains idiom at the end (e.g. ~ipad), it will be exported 
 
 When your execute `figma-export typography` command `figma-export` generates 3 files:
 1. `UIFont+extension.swift` extension for UIFont that declares your custom fonts. Use these fonts like this `UIFont.header()`, `UIFont.caption1()`.
-2. `LabelStyle.swift` struct for generating attributes for NSAttributesString with custom lineHeight and tracking (letter spacing).
+2. `TextStyle.swift` struct for generating attributes for NSAttributesString with custom lineHeight and tracking (letter spacing).
 3. `Label.swift` file that contains base Label class and class for each text style. E.g. HeaderLabel, BodyLabel, Caption1Label. Specify these classes in xib files on in code.
 
 Example of these files:
 - [./Examples/Example/UIComponents/Source/Label.swift](./Examples/Example/UIComponents/Source/Label.swift)
-- [./Examples/Example/UIComponents/Source/LabelStyle.swift](./Examples/Example/UIComponents/Source/LabelStyle.swift)
+- [./Examples/Example/UIComponents/Source/TextStyle.swift](./Examples/Example/UIComponents/Source/TextStyle.swift)
 - [./Examples/Example/UIComponents/Source/UIFont+extension.swift](./Examples/Example/UIComponents/Source/UIFont+extension.swift)
 
 ### Android
@@ -411,8 +411,8 @@ Custom Stencil templates for colors and images must have the following names:
 
 Custom Stencil templates for typography must have the following names:
 - Label.swift.stencil,
-- LabelStyle.swift.stencil,
-- LabelStyle+extension.swift.stencil,
+- TextStyle.swift.stencil,
+- TextStyle+extension.swift.stencil,
 - UIFont+extension.swift.stencil
 - Font+extension.swift.stencil.stencil
 

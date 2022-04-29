@@ -9,7 +9,7 @@
 
 import UIKit
 
-public struct LabelStyle {
+public struct TextStyle {
 
     enum TextCase {
         case uppercased

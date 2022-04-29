@@ -3,7 +3,7 @@ import UIKit
 
 public class Label: UILabel {
 
-    var style: LabelStyle? { nil }
+    var style: TextStyle? { nil }
 
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -66,8 +66,8 @@ public class Label: UILabel {
 {% for style in styles %}
 public final class {{ style.className }}Label: Label {
 
-    override var style: LabelStyle? {
-        {% if separateStyles %}.{{ style.varName }}(){% else %}LabelStyle(
+    override var style: TextStyle? {
+        {% if separateStyles %}.{{ style.varName }}(){% else %}TextStyle(
             font: UIFont.{{ style.varName }}(){% if style.supportsDynamicType %},
             fontMetrics: UIFontMetrics(forTextStyle: .{{ style.type }}){% endif %}{% if style.lineHeight != 0 %},
             lineHeight: {{ style.lineHeight }}{% endif %}{% if style.tracking != 0 %},

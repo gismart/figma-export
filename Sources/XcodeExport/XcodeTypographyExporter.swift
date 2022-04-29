@@ -95,7 +95,7 @@ final public class XcodeTypographyExporter: XcodeExporterBase {
                 "textCase": style.textCase.rawValue
             ]}
         let env = makeEnvironment(templatesPath: output.templatesPath)
-        let contents = try env.renderTemplate(name: "LabelStyle+extension.swift.stencil", context: ["styles": dict])
+        let contents = try env.renderTemplate(name: "TextStyle+extension.swift.stencil", context: ["styles": dict])
         
         let labelStylesSwiftExtension = try makeFileContents(for: contents, url: labelStyleExtensionURL)
         return labelStylesSwiftExtension
@@ -124,7 +124,7 @@ final public class XcodeTypographyExporter: XcodeExporterBase {
     
     private func makeLabelStyle(labelsDirectory: URL) throws -> FileContents {
         let env = makeEnvironment(templatesPath: output.templatesPath)
-        let labelStyleSwiftContents = try env.renderTemplate(name: "LabelStyle.swift.stencil")
-        return try makeFileContents(for: labelStyleSwiftContents, directory: labelsDirectory, file: URL(string: "LabelStyle.swift")!)
+        let labelStyleSwiftContents = try env.renderTemplate(name: "TextStyle.swift.stencil")
+        return try makeFileContents(for: labelStyleSwiftContents, directory: labelsDirectory, file: URL(string: "TextStyle.swift")!)
     }
 }

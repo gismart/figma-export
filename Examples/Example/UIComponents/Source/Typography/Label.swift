@@ -11,7 +11,7 @@ import UIKit
 
 public class Label: UILabel {
 
-    var style: LabelStyle? { nil }
+    var style: TextStyle? { nil }
 
     public override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
@@ -74,35 +74,35 @@ public class Label: UILabel {
 
 public final class BodyLabel: Label {
 
-    override var style: LabelStyle? {
+    override var style: TextStyle? {
         .body()
     }
 }
 
 public final class CaptionLabel: Label {
 
-    override var style: LabelStyle? {
+    override var style: TextStyle? {
         .caption()
     }
 }
 
 public final class HeaderLabel: Label {
 
-    override var style: LabelStyle? {
+    override var style: TextStyle? {
         .header()
     }
 }
 
 public final class LargeTitleLabel: Label {
 
-    override var style: LabelStyle? {
+    override var style: TextStyle? {
         .largeTitle()
     }
 }
 
 public final class UppercasedLabel: Label {
 
-    override var style: LabelStyle? {
+    override var style: TextStyle? {
         .uppercased()
     }
 }

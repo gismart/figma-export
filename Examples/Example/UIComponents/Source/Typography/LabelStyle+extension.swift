@@ -9,39 +9,39 @@
 
 import UIKit
 
-public extension LabelStyle {
+public extension TextStyle {
     
-    static func body() -> LabelStyle {
-        LabelStyle(
+    static func body() -> TextStyle {
+        TextStyle(
             font: UIFont.body(),
             fontMetrics: UIFontMetrics(forTextStyle: .body),
             lineHeight: 24.0
         )
     }
     
-    static func caption() -> LabelStyle {
-        LabelStyle(
+    static func caption() -> TextStyle {
+        TextStyle(
             font: UIFont.caption(),
             fontMetrics: UIFontMetrics(forTextStyle: .footnote),
             lineHeight: 20.0
         )
     }
     
-    static func header() -> LabelStyle {
-        LabelStyle(
+    static func header() -> TextStyle {
+        TextStyle(
             font: UIFont.header()
         )
     }
     
-    static func largeTitle() -> LabelStyle {
-        LabelStyle(
+    static func largeTitle() -> TextStyle {
+        TextStyle(
             font: UIFont.largeTitle(),
             fontMetrics: UIFontMetrics(forTextStyle: .largeTitle)
         )
     }
     
-    static func uppercased() -> LabelStyle {
-        LabelStyle(
+    static func uppercased() -> TextStyle {
+        TextStyle(
             font: UIFont.uppercased(),
             lineHeight: 20.0,
             textCase: .uppercased

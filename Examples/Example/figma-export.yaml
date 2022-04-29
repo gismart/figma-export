@@ -64,7 +64,7 @@ ios:
     # Path to directory where to place UIFont+extension.swift file
     fontSwift: "./UIComponents/Source/Typography/UIFont+extension.swift"
     # [optional] Absolute or relative path to swift file where to generate LabelStyle extensions for each style (LabelStyle extension).
-    labelStyleSwift: "./UIComponents/Source/Typography/LabelStyle+extension.swift"
+    labelStyleSwift: "./UIComponents/Source/Typography/TextStyle+extension.swift"
     # Will FigmaExport generate UILabel for each text style (font) e.g. HeaderLabel, BodyLabel, CaptionLabel.
     generateLabels: true
     # Path to directory where to place UILabel for each text style (font) (Required if generateLabels = true)
