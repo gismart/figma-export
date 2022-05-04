@@ -8,6 +8,7 @@
 [![codebeat badge](https://codebeat.co/badges/6c346142-a942-4c13-ae6b-5517b4c50b1d)](https://codebeat.co/projects/github-com-redmadrobot-figma-export-master)
 [![Test](https://github.com/RedMadRobot/figma-export/actions/workflows/tests.yml/badge.svg)](https://github.com/RedMadRobot/figma-export/actions/workflows/tests.yml)
 
+
 Command line utility to export colors, typography, icons and images from Figma to Xcode / Android Studio project.
 * color - Figma's color style
 * typography - Figma's text style
