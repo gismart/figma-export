@@ -312,7 +312,7 @@ extension Component {
             return true
         }
         
-        let keywords = ["ios", "android", "none"]
+        let keywords = ["iOS", "Android", "none"]
         
         let hasNotKeywords = keywords.allSatisfy { !description.contains($0) }
         if hasNotKeywords {
