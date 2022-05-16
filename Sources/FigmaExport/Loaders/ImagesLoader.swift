@@ -308,11 +308,11 @@ private extension String {
 extension Component {
     
     public func useForPlatform(_ platform: Platform) -> Bool {
-        guard let description = description, !description.isEmpty else {
+        guard let description = description?.lowercased(), !description.isEmpty else {
             return true
         }
         
-        let keywords = ["iOS", "Android", "none"]
+        let keywords = ["ios", "android", "none"]
         
         let hasNotKeywords = keywords.allSatisfy { !description.contains($0) }
         if hasNotKeywords {
