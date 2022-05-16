@@ -362,6 +362,8 @@ public extension AssetsProcessable {
             } else {
                 renamedAsset.name = renamedAsset.name.replacingOccurrences(of: "/", with: "_")
             }
+            //Trim whitespaces
+            renamedAsset.name = renamedAsset.name.replacingOccurrences(of: " " , with: "")
             return renamedAsset
         }
     }
