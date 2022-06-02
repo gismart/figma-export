@@ -4,5 +4,6 @@
         <item name="android:fontFamily">{{ textStyle.fontFamily }}</item>
         <item name="android:textSize">{{ textStyle.textSize }}sp</item>
         <item name="android:letterSpacing">{{ textStyle.letterSpacing }}</item>
+        <item name="android:lineSpacingMultiplier">{{ textStyle.lineSpacingMultiplier }}</item>
     </style>{% endfor %}
 </resources>
