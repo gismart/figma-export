@@ -821,6 +821,7 @@ final class XcodeTypographyExporterTests: XCTestCase {
             fontStyle: fontStyle,
             lineHeight: lineHeight,
             letterSpacing: letterSpacing,
+            lineSpacingMultiplier: 1.0,
             textCase: textCase)
     }
 }

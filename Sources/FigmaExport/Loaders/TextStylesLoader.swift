@@ -48,6 +48,7 @@ final class TextStylesLoader {
                 fontStyle: DynamicTypeStyle(rawValue: style.description),
                 lineHeight: lineHeight,
                 letterSpacing: textStyle.letterSpacing,
+                lineSpacingMultiplier: (textStyle.lineHeightPercentFontSize / 100.0 * 1000.0).rounded() / 1000.0,
                 textCase: textCase
             )
         }

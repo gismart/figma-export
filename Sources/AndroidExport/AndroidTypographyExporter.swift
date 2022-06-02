@@ -44,7 +44,8 @@ final public class AndroidTypographyExporter: AndroidExporter {
                 "letterSpacing": androidLetterSpacing(
                     letterSpacing: textStyle.letterSpacing,
                     fontSize: textStyle.fontSize
-                )
+                ),
+                "lineSpacingMultiplier": textStyle.lineSpacingMultiplier
             ]
         }
         let context: [String: Any] = [

@@ -17,8 +17,8 @@ final class AndroidTypographyExporterTests: XCTestCase {
         templatesPath: nil
     )
     
-    private let textStyle1 = TextStyle(name: "title", fontName: "Test-Font", fontSize: 20.0, fontStyle: nil, letterSpacing: 0.25)
-    private let textStyle2 = TextStyle(name: "subtitle", platform: nil, fontName: "Test-Font", fontSize: 19.5, fontStyle: nil, lineHeight: 20.0, letterSpacing: 0, textCase: TextStyle.TextCase.original)
+    private let textStyle1 = TextStyle(name: "title", fontName: "Test-Font", fontSize: 20.0, fontStyle: nil, letterSpacing: 0.25, lineSpacingMultiplier: 1.0)
+    private let textStyle2 = TextStyle(name: "subtitle", platform: nil, fontName: "Test-Font", fontSize: 19.5, fontStyle: nil, lineHeight: 20.0, letterSpacing: 0, lineSpacingMultiplier: 1.0, textCase: TextStyle.TextCase.original)
     
     // MARK: - Setup
     

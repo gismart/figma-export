@@ -54,6 +54,7 @@ public struct TextStyle: Asset {
     public let fontStyle: DynamicTypeStyle?
     public let lineHeight: Double?
     public let letterSpacing: Double
+    public let lineSpacingMultiplier: Double
     public let textCase: TextCase
 
     public init(
@@ -64,6 +65,7 @@ public struct TextStyle: Asset {
         fontStyle: DynamicTypeStyle?,
         lineHeight: Double? = nil,
         letterSpacing: Double,
+        lineSpacingMultiplier: Double,
         textCase: TextCase = .original) {
         
         self.name = name
@@ -72,6 +74,7 @@ public struct TextStyle: Asset {
         self.fontStyle = fontStyle
         self.lineHeight = lineHeight
         self.letterSpacing = letterSpacing
+        self.lineSpacingMultiplier = lineSpacingMultiplier
         self.textCase = textCase
     }
 
