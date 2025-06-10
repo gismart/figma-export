@@ -13,7 +13,7 @@ common:
   # [optional]
   colors:
     # [optional] RegExp pattern for color name validation before exporting. If a name contains "/" symbol it will be replaced by "_" before executing the RegExp
-    nameValidateRegexp: '^([a-zA-Z_])+$' # RegExp pattern for: background, background_primary, widget_primary_background
+    nameValidateRegexp: '^([a-zA-Z_]+)$' # RegExp pattern for: background, background_primary, widget_primary_background
     # [optional] RegExp pattern for replacing. Supports only $n
     nameReplaceRegexp: 'color_$1'
     # [optional] Extract light and dark mode colors from the lightFileId specified in the figma params. Defaults to false
@@ -63,6 +63,8 @@ ios:
   xcassetsInMainBundle: true
   # [optional] Is Assets.xcassets located in a swift package? Default value is false.
   xcassetsInSwiftPackage: false
+  # [optional] When `xcassetsInSwiftPackage: true` use this property to specify a resource bundle name for Swift packages containing Assets.xcassets (e.g. ["PackageName_TargetName"]). This is necessary to avoid SwiftUI Preview crashes.
+  resourceBundleNames: []
   # [optional] Add @objc attribute to generated properties so that they are accessible in Objective-C. Defaults to false
   addObjcAttribute: false
                          

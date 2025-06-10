@@ -52,7 +52,8 @@ final class ImagesLoader {
         )
         let darkSuffix = params.common?.icons?.darkModeSuffix ?? "_dark"
         let lightIcons = icons
-            .filter { !$0.name.hasSuffix(darkSuffix) }
+            .filter { !$0.name.hasSuffix(darkSuffix)}
+            .map { updateRenderMode($0) }
         let darkIcons = icons
             .filter { $0.name.hasSuffix(darkSuffix) }
             .map { icon -> ImagePack in
@@ -60,7 +61,32 @@ final class ImagesLoader {
                 newIcon.name = String(icon.name.dropLast(darkSuffix.count))
                 return newIcon
             }
+            .map { updateRenderMode($0) }
         return (lightIcons, darkIcons)
+    }
+
+    private func updateRenderMode(_ icon: ImagePack) -> ImagePack {
+        // Filtering at suffixes
+        var renderMode = params.ios?.icons?.renderMode ?? .template
+        let defaultSuffix = renderMode == .template ? params.ios?.icons?.renderModeDefaultSuffix : nil
+        let originalSuffix = renderMode == .template ? params.ios?.icons?.renderModeOriginalSuffix : nil
+        let templateSuffix = renderMode != .template ? params.ios?.icons?.renderModeTemplateSuffix : nil
+        var suffix: String?
+
+        if let defaultSuffix, icon.name.hasSuffix(defaultSuffix) {
+            renderMode = .default
+            suffix = defaultSuffix
+        } else if let originalSuffix, icon.name.hasSuffix(originalSuffix) {
+            renderMode = .original
+            suffix = originalSuffix
+        } else if let templateSuffix, icon.name.hasSuffix(templateSuffix) {
+            renderMode = .template
+            suffix = templateSuffix
+        }
+        var newIcon = icon
+        newIcon.name = String(icon.name.dropLast(suffix?.count ?? 0))
+        newIcon.renderMode = renderMode
+        return newIcon
     }
 
     private func loadIconsFromLightAndDarkFile(filter: String? = nil) throws -> (light: [ImagePack], dark: [ImagePack]?) {
@@ -78,13 +104,14 @@ final class ImagesLoader {
             frameName: iconsFrameName,
             params: formatParams,
             filter: filter
-        )
+        ).map { updateRenderMode($0) }
         let darkIcons = params.figma.darkFileId.flatMap {
             try? _loadImages(
                 fileId: $0,
                 frameName: iconsFrameName,
                 params: formatParams,
-                filter: filter)
+                filter: filter
+            ).map { updateRenderMode($0) }
         }
         return (lightIcons, darkIcons)
     }
@@ -110,6 +137,11 @@ final class ImagesLoader {
                 .filter { !$0.name.hasSuffix(darkSuffix) }
             let darkImages = images
                 .filter { $0.name.hasSuffix(darkSuffix) }
+                .map { image -> ImagePack in
+                    var newImage = image
+                    newImage.name = String(image.name.dropLast(darkSuffix.count))
+                    return newImage
+                }
             return (lightImages, darkImages)
         default:
             let pack = try _loadImages(
@@ -121,6 +153,11 @@ final class ImagesLoader {
                 .filter { !$0.name.hasSuffix(darkSuffix) }
             let darkPack = pack
                 .filter { $0.name.hasSuffix(darkSuffix) }
+                .map { image -> ImagePack in
+                    var newImage = image
+                    newImage.name = String(image.name.dropLast(darkSuffix.count))
+                    return newImage
+                }
             return (lightPack, darkPack)
         }
     }
@@ -170,7 +207,7 @@ final class ImagesLoader {
                 $0.containingFrame.name == frameName && $0.useForPlatform(platform)
             }
 
-        if let filter = filter {
+        if let filter {
             let assetsFilter = AssetsFilter(filter: filter)
             components = components.filter { component -> Bool in
                 assetsFilter.match(name: component.name)
@@ -186,16 +223,35 @@ final class ImagesLoader {
         params: FormatParams,
         filter: String? = nil
     ) throws -> [ImagePack] {
-        let imagesDict = try fetchImageComponents(fileId: fileId, frameName: frameName, filter: filter)
+        var imagesDict = try fetchImageComponents(fileId: fileId, frameName: frameName, filter: filter)
 
         guard !imagesDict.isEmpty else {
             throw FigmaExportError.componentsNotFound
         }
-
-        let imagesIds: [NodeId] = imagesDict.keys.map { $0 }
+        
+        // Component name must not be empty
+        imagesDict = imagesDict.filter { (key: NodeId, component: Component) in
+            if component.name.trimmingCharacters(in: .whitespaces).isEmpty {
+                logger.warning("""
+                Found a component with empty name.
+                Page name: \(component.containingFrame.pageName)
+                Frame: \(component.containingFrame.name ?? "nil")
+                Description: \(component.description ?? "nil")
+                The component wont be exported. Fix component name in the Figma file and try again.
+                """)
+                return false
+            }
+            return true
+        }
         
         logger.info("Fetching vector images...")
-        let imageIdToImagePath = try loadImages(fileId: fileId, nodeIds: imagesIds, params: params)
+        let imageIdToImagePath = try loadImages(fileId: fileId, imagesDict: imagesDict, params: params)
+        
+        // Remove components for which image file could not be fetched
+        let badNodeIds = Set(imagesDict.keys).symmetricDifference(Set(imageIdToImagePath.keys))
+        badNodeIds.forEach { nodeId in
+            imagesDict.removeValue(forKey: nodeId)
+        }
 
         // Group images by name
         let groups = Dictionary(grouping: imagesDict) { $1.name.parseNameAndIdiom(platform: platform).name }
@@ -207,7 +263,8 @@ final class ImagesLoader {
                     return nil
                 }
                 let (name, idiom) = component.name.parseNameAndIdiom(platform: platform)
-                return Image(name: name, scale: .all, idiom: idiom, url: url, format: params.format)
+                let isRTL = component.useRTL()
+                return Image(name: name, scale: .all, idiom: idiom, url: url, format: params.format, isRTL: isRTL)
             }
             return ImagePack(name: packName, images: packImages, platform: platform)
         }
@@ -221,13 +278,12 @@ final class ImagesLoader {
             throw FigmaExportError.componentsNotFound
         }
 
-        let imagesIds: [NodeId] = imagesDict.keys.map { $0 }
         let scales = getScales(platform: platform)
 
         var images: [Double: [NodeId: ImagePath]] = [:]
         for scale in scales {
             logger.info("Fetching PNG images for scale \(scale)...")
-            images[scale] = try loadImages(fileId: fileId, nodeIds: imagesIds, params: PNGParams(scale: scale))
+            images[scale] = try loadImages(fileId: fileId, imagesDict: imagesDict, params: PNGParams(scale: scale))
         }
 
         // Group images by name
@@ -272,12 +328,25 @@ final class ImagesLoader {
         return try client.request(endpoint)
     }
 
-    private func loadImages(fileId: String, nodeIds: [NodeId], params: FormatParams) throws -> [NodeId: ImagePath] {
+    private func loadImages(fileId: String, imagesDict: [NodeId: Component], params: FormatParams) throws -> [NodeId: ImagePath] {
         let batchSize = 100
+        
+        let nodeIds: [NodeId] = imagesDict.keys.map { $0 }
+        
         let keysWithValues: [(NodeId, ImagePath)] = try nodeIds.chunked(into: batchSize)
             .map { ImageEndpoint(fileId: fileId, nodeIds: $0, params: params) }
             .map { try client.request($0) }
-            .flatMap { $0.map { ($0, $1) } }
+            .flatMap { dict in
+                dict.compactMap { nodeId, imagePath in
+                    if let imagePath {
+                        return (nodeId, imagePath)
+                    } else {
+                        let componentName = imagesDict[nodeId]?.name ?? ""
+                        logger.error("Unable to get image for node with id = \(nodeId). Please check that component \(componentName) in the Figma file is not empty. Skipping this file...")
+                        return nil
+                    }
+                }
+            }
         return Dictionary(uniqueKeysWithValues: keysWithValues)
     }
 }
@@ -325,5 +394,10 @@ extension Component {
         }
         
         return false
+    }
+    
+    public func useRTL() -> Bool {
+        guard let description = description, !description.isEmpty else { return false }        
+        return description.localizedCaseInsensitiveContains("rtl")
     }
 }

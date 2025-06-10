@@ -3,25 +3,26 @@ import Foundation
 import FoundationNetworking
 #endif
 
-public struct StylesEndpoint: BaseEndpoint {
-    public typealias Content = [Style]
+public struct VariablesEndpoint: BaseEndpoint {
+    public typealias Content = VariablesMeta
 
     private let fileId: String
-    
+
     public init(fileId: String) {
         self.fileId = fileId
     }
 
-    func content(from root: StylesResponse) -> Content {
-        return root.meta.styles
+    func content(from root: VariablesResponse) -> Content {
+        return root.meta
     }
 
     public func makeRequest(baseURL: URL) -> URLRequest {
         let url = baseURL
             .appendingPathComponent("files")
             .appendingPathComponent(fileId)
-            .appendingPathComponent("styles")
+            .appendingPathComponent("variables")
+            .appendingPathComponent("local")
         return URLRequest(url: url)
     }
-    
+
 }

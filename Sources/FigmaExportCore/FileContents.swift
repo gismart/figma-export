@@ -31,35 +31,39 @@ public struct FileContents: Equatable {
     
     public var dark: Bool = false
     public var scale: Double = 1.0
+    public var isRTL: Bool = false
     
     /// In-memory file
-    public init(destination: Destination, data: Data, scale: Double = 1.0, dark: Bool = false) {
+    public init(destination: Destination, data: Data, scale: Double = 1.0, dark: Bool = false, isRTL: Bool = false) {
         self.destination = destination
         self.data = data
         self.dataFile = nil
         self.sourceURL = nil
         self.scale = scale
         self.dark = dark
+        self.isRTL = isRTL
     }
     
     /// Remote file
-    public init(destination: Destination, sourceURL: URL, scale: Double = 1.0, dark: Bool = false) {
+    public init(destination: Destination, sourceURL: URL, scale: Double = 1.0, dark: Bool = false, isRTL: Bool = false) {
         self.destination = destination
         self.data = nil
         self.dataFile = nil
         self.sourceURL = sourceURL
         self.scale = scale
         self.dark = dark
+        self.isRTL = isRTL
     }
     
     /// On-disk file
-    public init(destination: Destination, dataFile: URL, scale: Double = 1.0, dark: Bool = false) {
+    public init(destination: Destination, dataFile: URL, scale: Double = 1.0, dark: Bool = false, isRTL: Bool = false) {
         self.destination = destination
         self.data = nil
         self.dataFile = dataFile
         self.sourceURL = nil
         self.scale = scale
         self.dark = dark
+        self.isRTL = isRTL
     }
     
     /// Make a copy of the FileContents with different file extension
@@ -71,11 +75,11 @@ public struct FileContents: Equatable {
 
         let newDestination = Destination(directory: destination.directory, file: newFileURL)
         
-        if let sourceURL = sourceURL { // Remote file
+        if let sourceURL { // Remote file
             return FileContents(destination: newDestination, sourceURL: sourceURL, scale: scale, dark: dark)
-        } else if let dataFile = dataFile { // On-disk file
+        } else if let dataFile { // On-disk file
             return FileContents(destination: newDestination, dataFile: dataFile, scale: scale, dark: dark)
-        } else if let data = data { // In-memory file
+        } else if let data { // In-memory file
             return FileContents(destination: newDestination, data: data, scale: scale, dark: dark)
         } else {
             fatalError("Unable to change file extension.")

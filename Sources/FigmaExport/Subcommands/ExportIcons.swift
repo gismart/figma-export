@@ -4,6 +4,9 @@ import FigmaAPI
 import XcodeExport
 import FigmaExportCore
 import AndroidExport
+#if os(Linux)
+import FoundationXML
+#endif
 
 extension FigmaExportCommand {
     
@@ -68,14 +71,11 @@ extension FigmaExportCommand {
                 assetsFolderURL: assetsURL,
                 assetsInMainBundle: ios.xcassetsInMainBundle,
                 assetsInSwiftPackage: ios.xcassetsInSwiftPackage,
+                resourceBundleNames: ios.resourceBundleNames,
                 addObjcAttribute: ios.addObjcAttribute,
                 preservesVectorRepresentation: iconsParams.preservesVectorRepresentation,
                 uiKitImageExtensionURL: iconsParams.imageSwift,
                 swiftUIImageExtensionURL: iconsParams.swiftUIImageSwift,
-                renderMode: iconsParams.renderMode,
-                renderModeDefaultSuffix: iconsParams.renderModeDefaultSuffix,
-                renderModeOriginalSuffix: iconsParams.renderModeOriginalSuffix,
-                renderModeTemplateSuffix: iconsParams.renderModeTemplateSuffix,
                 templatesPath: ios.templatesPath)
             
             let exporter = XcodeIconsExporter(output: output)
@@ -148,12 +148,12 @@ extension FigmaExportCommand {
                 let lightFiles = asset.light.images.map { image -> FileContents in
                     let fileURL = URL(string: "\(image.name).svg")!
                     let dest = Destination(directory: tempDirectoryLightURL, file: fileURL)
-                    return FileContents(destination: dest, sourceURL: image.url)
+                    return FileContents(destination: dest, sourceURL: image.url, isRTL: image.isRTL)
                 }
                 let darkFiles = asset.dark?.images.map { image -> FileContents in
                     let fileURL = URL(string: "\(image.name).svg")!
                     let dest = Destination(directory: tempDirectoryDarkURL, file: fileURL)
-                    return FileContents(destination: dest, sourceURL: image.url, dark: true)
+                    return FileContents(destination: dest, sourceURL: image.url, dark: true, isRTL: image.isRTL)
                 } ?? []
                 return lightFiles + darkFiles
             }
@@ -186,6 +186,7 @@ extension FigmaExportCommand {
             
             // 6. Move XML files to main/res/drawable/
             localFiles = localFiles.map { fileContents -> FileContents in
+                let directory = fileContents.dark ? darkDirectory : lightDirectory
                 
                 let source = fileContents.destination.url
                     .deletingPathExtension()
@@ -194,8 +195,9 @@ extension FigmaExportCommand {
                 let fileURL = fileContents.destination.file
                     .deletingPathExtension()
                     .appendingPathExtension("xml")
-
-                let directory = fileContents.dark ? darkDirectory : lightDirectory
+                
+                rewriteXMLFile(from: source, fileContents: fileContents)
+                
                 return FileContents(
                     destination: Destination(directory: directory, file: fileURL),
                     dataFile: source
@@ -216,7 +218,7 @@ extension FigmaExportCommand {
             }.map { fileContents -> String in
                 fileContents.destination.file.deletingPathExtension().lastPathComponent
             })
-            let composeFile = try composeExporter.exportIcons(iconNames: Array(composeIconNames))
+            let composeFile = try composeExporter.exportIcons(iconNames: Array(composeIconNames).sorted())
             composeFile.map { localFiles.append($0) }
 
             logger.info("Writing files to Android Studio project...")
@@ -228,6 +230,27 @@ extension FigmaExportCommand {
             checkForUpdate(logger: logger)
             
             logger.info("Done!")
+        }
+    }
+}
+
+private extension FigmaExportCommand.ExportIcons {
+    private func rewriteXMLFile(from source: URL, fileContents: FileContents) {
+        guard fileContents.isRTL,
+              let attribute = XMLNode.attribute(withName: "android:autoMirrored", stringValue: "\(fileContents.isRTL)") as? XMLNode
+        else { return }
+        if let sourceXML = try? XMLDocument(contentsOf: source, options: .documentTidyXML) {
+            try? sourceXML.nodes(forXPath: "//vector").forEach { node in
+                guard let element = node as? XMLElement else { return }
+                element.addAttribute(attribute)
+            }
+
+            do {
+                FigmaExportCommand.logger.info("Adding autoMirrored property for xml file...")
+                try FigmaExportCommand.fileWriter.write(xmlFile: sourceXML, directory: source)
+            } catch {
+                FigmaExportCommand.logger.info("Rewrite XMLFile - \(sourceXML) failed")
+            }
         }
     }
 }

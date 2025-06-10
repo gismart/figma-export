@@ -1,5 +1,8 @@
 import Foundation
 import FigmaExportCore
+#if os(Linux)
+import FoundationXML
+#endif
 
 final class FileWriter {
     
@@ -16,12 +19,18 @@ final class FileWriter {
             
             let fileURL = URL(fileURLWithPath: file.destination.url.path)
             if let data = file.data {
-                try data.write(to: fileURL, options: .atomicWrite)
+                try data.write(to: fileURL, options: .atomic)
             } else if let localFileURL = file.dataFile {
                 _ = try fileManager.replaceItemAt(fileURL, withItemAt: localFileURL)
             } else {
                 fatalError("FileContents.data is nil. Use FileDownloader to download contents of the file.")
             }
         }
+    }
+    
+    func write(xmlFile: XMLDocument, directory: URL) throws {
+        let fileURL = URL(fileURLWithPath: directory.path)
+        let options: XMLNode.Options = [.nodePrettyPrint, .nodeCompactEmptyElement]
+        try xmlFile.xmlData(options: options).write(to: fileURL, options: .atomic)
     }
 }

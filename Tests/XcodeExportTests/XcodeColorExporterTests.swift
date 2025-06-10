@@ -59,6 +59,10 @@ final class XcodeColorExporterTests: XCTestCase {
 
         import UIKit
 
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
         public extension UIColor {
             static var colorPair1: UIColor {
                 UIColor { traitCollection -> UIColor in
@@ -97,6 +101,10 @@ final class XcodeColorExporterTests: XCTestCase {
 
         import UIKit
 
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
         public extension UIColor {
             static var colorPair1: UIColor { UIColor(named: #function)! }
             static var colorPair2: UIColor { UIColor(named: #function)! }
@@ -129,6 +137,10 @@ final class XcodeColorExporterTests: XCTestCase {
         \(header)
 
         import UIKit
+
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
 
         public extension UIColor {
             @objc static var colorPair1: UIColor { UIColor(named: #function)! }
@@ -221,7 +233,11 @@ final class XcodeColorExporterTests: XCTestCase {
 
         import SwiftUI
 
-        public extension Color {
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
+        public extension ShapeStyle where Self == Color {
             static var colorPair1: Color { Color(#function) }
             static var colorPair2: Color { Color(#function) }
         }
@@ -258,7 +274,7 @@ final class XcodeColorExporterTests: XCTestCase {
             static let bundle = Bundle.module
         }
 
-        public extension Color {
+        public extension ShapeStyle where Self == Color {
             static var colorPair1: Color { Color(#function, bundle: BundleProvider.bundle) }
             static var colorPair2: Color { Color(#function, bundle: BundleProvider.bundle) }
         }
@@ -291,6 +307,10 @@ final class XcodeColorExporterTests: XCTestCase {
 
         import UIKit
 
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
         public extension UIColor {
             static var backgroundPrimary: UIColor { UIColor(named: "background/primary")! }
         }
@@ -313,10 +333,49 @@ final class XcodeColorExporterTests: XCTestCase {
 
         import UIKit
 
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
         public extension UIColor {
             static var `class`: UIColor {
                 UIColor(red: 1.000, green: 1.000, blue: 1.000, alpha: 1.000)
             }
+        }
+
+        """)
+    }
+
+    func testExport_without_assets_swiftui() throws {
+        let output = XcodeColorsOutput(
+            assetsColorsURL: nil,
+            assetsInMainBundle: true,
+            colorSwiftURL: nil,
+            swiftuiColorSwiftURL: colorsFile
+        )
+        
+        let exporter = XcodeColorExporter(output: output)
+
+        let result = try exporter.export(colorPairs: [colorPair1, colorPair2])
+        XCTAssertEqual(result.count, 1)
+
+        XCTAssertTrue(result[0].destination.url.absoluteString.hasSuffix("Colors.swift"))
+
+        let content = result[0].data
+        XCTAssertNotNil(content)
+
+        try assertCodeEquals(content, """
+        \(header)
+
+        import SwiftUI
+
+        private class BundleProvider {
+            static let bundle = Bundle(for: BundleProvider.self)
+        }
+
+        public extension ShapeStyle where Self == Color {
+            static var colorPair1: Color { Color(red: 1.000, green: 1.000, blue: 1.000, opacity: 1.000) }
+            static var colorPair2: Color { Color(red: 0.467, green: 0.012, blue: 1.000, opacity: 0.500) }
         }
 
         """)

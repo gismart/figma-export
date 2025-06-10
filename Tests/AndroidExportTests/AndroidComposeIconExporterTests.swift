@@ -31,6 +31,9 @@ final class AndroidComposeIconExporterTests: XCTestCase {
         XCTAssertEqual(result.destination.file.absoluteString, "Icons.kt")
         let generatedComposedCode = String(data: try XCTUnwrap(result.data), encoding: .utf8)
         let referenceComposeCode = """
+        /*
+        \(header)
+        */
         package \(AndroidComposeIconExporterTests.packageName)
         
         import androidx.compose.material.Icon
@@ -46,7 +49,7 @@ final class AndroidComposeIconExporterTests: XCTestCase {
         
         @Composable
         fun Icons.TestIcon1(
-            contentDescription: String?,
+            contentDescription: String? = null,
             modifier: Modifier = Modifier,
             tint: Color = Color.Unspecified
         ) {
@@ -60,7 +63,7 @@ final class AndroidComposeIconExporterTests: XCTestCase {
         
         @Composable
         fun Icons.TestIcon2(
-            contentDescription: String?,
+            contentDescription: String? = null,
             modifier: Modifier = Modifier,
             tint: Color = Color.Unspecified
         ) {

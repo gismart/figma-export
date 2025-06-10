@@ -1,8 +1,6 @@
 import Foundation
 import FigmaExportCore
 
-extension NameStyle: Decodable {}
-
 struct Params: Decodable {
 
     struct Figma: Decodable {
@@ -14,6 +12,7 @@ struct Params: Decodable {
     }
 
     struct Common: Decodable {
+
         struct Colors: Decodable {
             let nameValidateRegexp: String?
             let nameReplaceRegexp: String?
@@ -21,6 +20,21 @@ struct Params: Decodable {
             let darkModeSuffix: String?
             let lightHCModeSuffix: String?
             let darkHCModeSuffix: String?
+        }
+
+        struct VariablesColors: Decodable {
+            let tokensFileId: String
+            let tokensCollectionName: String
+
+            let lightModeName: String
+            let darkModeName: String?
+            let lightHCModeName: String?
+            let darkHCModeName: String?
+
+            let primitivesModeName: String?
+
+            let nameValidateRegexp: String?
+            let nameReplaceRegexp: String?
         }
 
         struct Icons: Decodable {
@@ -45,6 +59,7 @@ struct Params: Decodable {
         }
 
         let colors: Colors?
+        let variablesColors: VariablesColors?
         let icons: Icons?
         let images: Images?
         let typography: Typography?
@@ -105,6 +120,7 @@ struct Params: Decodable {
         let xcassetsPath: URL
         let xcassetsInMainBundle: Bool
         let xcassetsInSwiftPackage: Bool?
+        let resourceBundleNames: [String]?
         let addObjcAttribute: Bool?
         let templatesPath: URL?
 
@@ -120,6 +136,7 @@ struct Params: Decodable {
             let composePackageName: String?
         }
         struct Colors: Decodable {
+            let xmlOutputFileName: String?
             let composePackageName: String?
         }
         struct Images: Decodable {

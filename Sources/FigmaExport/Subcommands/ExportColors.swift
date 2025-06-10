@@ -17,21 +17,63 @@ extension FigmaExportCommand {
         @OptionGroup
         var options: FigmaExportOptions
         
+        @Argument(help: """
+        [Optional] Name of the colors to export. For example \"background/default\" \
+        to export single color, \"background/default, background/secondary\" to export several colors and \
+        \"background/*\" to export all colors from the folder.
+        """)
+        var filter: String?
+        
         func run() throws {
-            let client = FigmaClient(accessToken: options.accessToken, timeout: options.params.figma.timeout)
-
             logger.info("Using FigmaExport \(FigmaExportCommand.version) to export colors.")
-
             logger.info("Fetching colors. Please wait...")
-            let loader = ColorsLoader(client: client, figmaParams: options.params.figma, colorParams: options.params.common?.colors)
-            let colors = try loader.load()
+
+            let client = FigmaClient(accessToken: options.accessToken, timeout: options.params.figma.timeout)
+            let commonParams = options.params.common
+
+            if commonParams?.colors != nil, commonParams?.variablesColors != nil {
+                throw FigmaExportError.custom(errorString: "In the configuration file, you can use either the common/colors or common/variablesColors parameter")
+            }
+
+            let figmaParams = options.params.figma
+            var colors: ColorsLoaderOutput?
+            var nameValidateRegexp: String?
+            var nameReplaceRegexp: String?
+
+            if let variableParams = commonParams?.variablesColors {
+                let loader = ColorsVariablesLoader(
+                    client: client,
+                    figmaParams: figmaParams,
+                    variableParams: variableParams,
+                    filter: filter
+                )
+                colors = try loader.load()
+
+                nameValidateRegexp = variableParams.nameValidateRegexp
+                nameReplaceRegexp = variableParams.nameReplaceRegexp
+            } else {
+                let loader = ColorsLoader(
+                    client: client,
+                    figmaParams: figmaParams,
+                    colorParams: commonParams?.colors,
+                    filter: filter
+                )
+                colors = try loader.load()
+
+                nameValidateRegexp = commonParams?.colors?.nameValidateRegexp
+                nameReplaceRegexp = commonParams?.colors?.nameReplaceRegexp
+            }
+
+            guard let colors else {
+                throw FigmaExportError.custom(errorString: "Failed to load colors from Figma")
+            }
 
             if let ios = options.params.ios {
                 logger.info("Processing colors...")
                 let processor = ColorsProcessor(
                     platform: .ios,
-                    nameValidateRegexp: options.params.common?.colors?.nameValidateRegexp,
-                    nameReplaceRegexp: options.params.common?.colors?.nameReplaceRegexp,
+                    nameValidateRegexp: nameValidateRegexp,
+                    nameReplaceRegexp: nameReplaceRegexp,
                     nameStyle: options.params.ios?.colors?.nameStyle
                 )
                 let colorPairs = processor.process(light: colors.light,
@@ -54,8 +96,8 @@ extension FigmaExportCommand {
                 logger.info("Processing colors...")
                 let processor = ColorsProcessor(
                     platform: .android,
-                    nameValidateRegexp: options.params.common?.colors?.nameValidateRegexp,
-                    nameReplaceRegexp: options.params.common?.colors?.nameReplaceRegexp,
+                    nameValidateRegexp: nameValidateRegexp,
+                    nameReplaceRegexp: nameReplaceRegexp,
                     nameStyle: .snakeCase
                 )
                 let colorPairs = processor.process(light: colors.light, dark: colors.dark)
@@ -91,6 +133,7 @@ extension FigmaExportCommand {
                 assetsColorsURL: colorsURL,
                 assetsInMainBundle: iosParams.xcassetsInMainBundle,
                 assetsInSwiftPackage: iosParams.xcassetsInSwiftPackage,
+                resourceBundleNames: iosParams.resourceBundleNames,
                 addObjcAttribute: iosParams.addObjcAttribute,
                 colorSwiftURL: colorParams.colorSwift,
                 swiftuiColorSwiftURL: colorParams.swiftuiColorSwift,
@@ -132,11 +175,13 @@ extension FigmaExportCommand {
                 packageName: androidParams.colors?.composePackageName,
                 templatesPath: androidParams.templatesPath
             )
-            let exporter = AndroidColorExporter(output: output)
+            let exporter = AndroidColorExporter(output: output, xmlOutputFileName: androidParams.colors?.xmlOutputFileName)
             let files = try exporter.export(colorPairs: colorPairs)
             
-            let lightColorsFileURL = androidParams.mainRes.appendingPathComponent("values/colors.xml")
-            let darkColorsFileURL = androidParams.mainRes.appendingPathComponent("values-night/colors.xml")
+            let fileName = androidParams.colors?.xmlOutputFileName ?? "colors.xml"
+            
+            let lightColorsFileURL = androidParams.mainRes.appendingPathComponent("values/" + fileName)
+            let darkColorsFileURL = androidParams.mainRes.appendingPathComponent("values-night/" + fileName)
             
             try? FileManager.default.removeItem(atPath: lightColorsFileURL.path)
             try? FileManager.default.removeItem(atPath: darkColorsFileURL.path)

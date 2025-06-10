@@ -1,4 +1,4 @@
-// swift-tools-version:5.4
+// swift-tools-version:5.7
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -6,18 +6,19 @@ import PackageDescription
 let package = Package(
     name: "figma-export",
     platforms: [
-        .macOS(.v10_13),
+        .macOS(.v10_13)
     ],
     products: [
         .executable(name: "figma-export", targets: ["FigmaExport"])
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
-        .package(url: "https://github.com/jpsim/Yams.git", from: "4.0.0"),
+        .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.0"),
-        .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.14.2"),
-        .package(url: "https://github.com/tuist/XcodeProj.git", from: "8.5.0"),
-        .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.3.0")
+        .package(url: "https://github.com/stencilproject/Stencil.git", from: "0.15.1"),
+        .package(url: "https://github.com/SwiftGen/StencilSwiftKit", from: "2.10.1"),
+        .package(url: "https://github.com/tuist/XcodeProj.git", from: "8.8.0"),
+        .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.6.0")
     ],
     targets: [
         
@@ -45,7 +46,10 @@ let package = Package(
         // Exports resources to Xcode project
         .target(
             name: "XcodeExport",
-            dependencies: ["FigmaExportCore", .product(name: "Stencil", package: "Stencil")],
+            dependencies: [
+                "FigmaExportCore", .product(name: "Stencil", package: "Stencil"),
+                "StencilSwiftKit"
+            ],
 			resources: [
               	.copy("Resources/")
 	        ]
@@ -54,7 +58,7 @@ let package = Package(
         // Exports resources to Android project
         .target(
             name: "AndroidExport",
-            dependencies: ["FigmaExportCore", "Stencil"],
+            dependencies: ["FigmaExportCore", "Stencil", "StencilSwiftKit"],
             resources: [
                 .copy("Resources/")
             ]
@@ -72,7 +76,10 @@ let package = Package(
         ),
         .testTarget(
             name: "XcodeExportTests",
-            dependencies: ["XcodeExport", .product(name: "CustomDump", package: "swift-custom-dump")]
+            dependencies: [
+                "XcodeExport", .product(name: "CustomDump", package: "swift-custom-dump"),
+                "StencilSwiftKit"
+            ]
         ),
         .testTarget(
             name: "AndroidExportTests",

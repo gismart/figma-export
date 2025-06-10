@@ -6,12 +6,9 @@ public struct XcodeImagesOutput {
     let assetsFolderURL: URL
     let assetsInMainBundle: Bool
     let assetsInSwiftPackage: Bool
+    let resourceBundleNames: [String]?
     let addObjcAttribute: Bool
     let preservesVectorRepresentation: [String]?
-    let renderMode: XcodeRenderMode?
-    let renderModeDefaultSuffix: String?
-    let renderModeOriginalSuffix: String?
-    let renderModeTemplateSuffix: String?
     let templatesPath: URL?
     
     let uiKitImageExtensionURL: URL?
@@ -27,27 +24,21 @@ public struct XcodeImagesOutput {
         assetsFolderURL: URL,
         assetsInMainBundle: Bool,
         assetsInSwiftPackage: Bool? = false,
+        resourceBundleNames: [String]? = nil,
         addObjcAttribute: Bool? = false,
         preservesVectorRepresentation: [String]? = nil,
         uiKitImageExtensionURL: URL? = nil,
         swiftUIImageExtensionURL: URL? = nil,
-        renderMode: XcodeRenderMode? = nil,
-        renderModeDefaultSuffix: String? = nil,
-        renderModeOriginalSuffix: String? = nil,
-        renderModeTemplateSuffix: String? = nil,
         templatesPath: URL? = nil
     ) {
         self.assetsFolderURL = assetsFolderURL
         self.assetsInMainBundle = assetsInMainBundle
         self.assetsInSwiftPackage = assetsInSwiftPackage ?? false
+        self.resourceBundleNames = resourceBundleNames
         self.addObjcAttribute = addObjcAttribute ?? false
         self.preservesVectorRepresentation = preservesVectorRepresentation
         self.uiKitImageExtensionURL = uiKitImageExtensionURL
         self.swiftUIImageExtensionURL = swiftUIImageExtensionURL
-        self.renderMode = renderMode
-        self.renderModeDefaultSuffix = renderModeDefaultSuffix
-        self.renderModeOriginalSuffix = renderModeOriginalSuffix
-        self.renderModeTemplateSuffix = renderModeTemplateSuffix
         self.templatesPath = templatesPath
     }
 }

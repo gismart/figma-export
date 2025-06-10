@@ -1,4 +1,7 @@
 import Foundation
+#if os(Linux)
+import FoundationNetworking
+#endif
 
 public class FormatParams: Encodable {
     /// A number between 0.01 and 4, the image scaling factor
@@ -19,7 +22,7 @@ public class FormatParams: Encodable {
             URLQueryItem(name: "format", value: format),
             URLQueryItem(name: "use_absolute_bounds", value: String(useAbsoluteBounds)),
         ]
-        if let scale = scale {
+        if let scale {
             items.append(URLQueryItem(name: "scale", value: String(scale)))
         }
         return items
@@ -59,7 +62,7 @@ public class PNGParams: FormatParams {
 
 public struct ImageEndpoint: BaseEndpoint {
     
-    public typealias Content = [NodeId: ImagePath]
+    public typealias Content = [NodeId: ImagePath?]
 
     private let nodeIds: String
     private let fileId: String
@@ -71,7 +74,7 @@ public struct ImageEndpoint: BaseEndpoint {
         self.params = params
     }
 
-    func content(from root: ImageResponse) -> [NodeId: ImagePath] {
+    func content(from root: ImageResponse) -> [NodeId: ImagePath?] {
         return root.images
     }
 
@@ -89,7 +92,7 @@ public struct ImageEndpoint: BaseEndpoint {
 }
 
 public struct ImageResponse: Decodable {
-    public let images: [NodeId: ImagePath]
+    public let images: [NodeId: ImagePath?]
 }
 
 public typealias ImagePath = String

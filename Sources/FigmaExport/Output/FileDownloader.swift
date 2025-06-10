@@ -1,6 +1,9 @@
 import Foundation
 import FigmaExportCore
 import Logging
+#if os(Linux)
+import FoundationNetworking
+#endif
 
 final class FileDownloader {
 
@@ -42,7 +45,8 @@ final class FileDownloader {
                     destination: file.destination,
                     dataFile: fileURL,
                     scale: file.scale,
-                    dark: file.dark
+                    dark: file.dark,
+                    isRTL: file.isRTL
                 )
                 newFiles.append(newFile)
                 downloaded += 1

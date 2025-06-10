@@ -10,6 +10,10 @@ public struct AssetsFilter {
             .map { $0.trimmingCharacters(in: .whitespaces) }
     }
     
+    public init(filters: [String]) {
+        self.filters = filters
+    }
+    
     /// Returns true if name matches with filter
     /// - Parameters:
     ///   - name: Name of the asset
@@ -25,7 +29,11 @@ public struct AssetsFilter {
     }
     
     private func wildcard(_ string: String, pattern: String) -> Bool {
+        #if os(Linux)
+        return false
+        #else
         let pred = NSPredicate(format: "self LIKE %@", pattern)
         return !NSArray(object: string).filtered(using: pred).isEmpty
+        #endif
     }
 }

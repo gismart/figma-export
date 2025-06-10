@@ -11,7 +11,7 @@ Specification of `figma-export.yaml` file with all the available options:
 ```yaml
 ---
 figma:
-  # Identifier of the file containing light color palette, icons and light images. To obtain a file id, open the file in the browser. The file id will be present in the URL after the word file and before the file name.
+  # [required] Identifier of the file containing light color palette, icons and light images. To obtain a file id, open the file in the browser. The file id will be present in the URL after the word file and before the file name.
   lightFileId: shPilWnVdJfo10YF12345
   # [optional] Identifier of the file containing dark color palette and dark images.
   darkFileId: KfF6DnJTWHGZzC912345
@@ -38,6 +38,26 @@ common:
     lightHCModeSuffix: '_lightHC'
     # [optional] If useSingleFile is true, customize the suffix to denote a dark high contrast color. Defaults to '_darkHC'
     darkHCModeSuffix: '_darkHC'
+  # [optional]
+  variablesColors:
+    # [required] Identifier of the file containing variables
+    tokensFileId: shPilWnVdJfo10YF12345
+    # [required] Variables collection name
+    tokensCollectionName: Base collection
+    # [required] Name of the column containing light color variables in the tokens table
+    lightModeName: Light
+    # [optional] Name of the column containing dark color variables in the tokens table
+    darkModeName: Dark
+    # [optional] Name of the column containing light high contrast color variables in the tokens table
+    lightHCModeName: Contast Light
+    # [optional] Name of the column containing dark high contrast color variables in the tokens table
+    darkHCModeName: Contast Dark
+    # [optional] Name of the column containing color variables in the primitive table. If a value is not specified, the default values ​​will be taken
+    primitivesModeName: Collection_1
+    # [optional] RegExp pattern for color name validation before exporting. If a name contains "/" symbol it will be replaced by "_" before executing the RegExp
+    nameValidateRegexp: '^([a-zA-Z_]+)$'
+    # [optional] RegExp pattern for replacing. Supports only $n
+    nameReplaceRegexp: 'color_$1'
   # [optional]
   icons:
     # [optional] Name of the Figma's frame where icons components are located
@@ -81,6 +101,8 @@ ios:
   xcassetsInMainBundle: true
   # [optional] Is Assets.xcassets located in a swift package? Default value is false.
   xcassetsInSwiftPackage: false
+  # [optional] When `xcassetsInSwiftPackage: true` use this property to specify a resource bundle name for Swift packages containing Assets.xcassets (e.g. ["PackageName_TargetName"]). This is necessary to avoid SwiftUI Preview crashes.
+  resourceBundleNames: []
   # [optional] Add @objc attribute to generated properties so that they are accessible in Objective-C. Defaults to false
   addObjcAttribute: false
   # [optional] Path to the Stencil templates used to generate code
@@ -88,7 +110,7 @@ ios:
   
   # [optional] Parameters for exporting colors
   colors:
-    # How to export colors? Use .xcassets and UIColor extension (useColorAssets = true) or extension only (useColorAssets = false)
+    # How to export colors? Use .xcassets and UIColor/Color extension (useColorAssets = true) or UIColor/Color extension only (useColorAssets = false)
     useColorAssets: true
     # [required if useColorAssets: True] Name of the folder inside Assets.xcassets where to place colors (.colorset directories)
     assetsFolder: Colors
@@ -109,7 +131,7 @@ ios:
     assetsFolder: Icons
     # Icon name style: camelCase or snake_case
     nameStyle: camelCase
-    # [optional] An array of icon names that will supports Preseve Vecotor Data
+    # [optional] An array of icon names that will supports Preseve Vecotor Data. Use `- "*"` to enable this option for all icons.
     preservesVectorRepresentation:
     - ic24TabBarMain
     - ic24TabBarEvents
