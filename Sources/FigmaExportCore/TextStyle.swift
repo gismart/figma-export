@@ -11,7 +11,7 @@ public enum DynamicTypeStyle: String, RawRepresentable {
     case caption1 = "Caption 1"
     case caption2 = "Caption 2"
     
-    public var textStyleName: String {
+    public var uiKitStyleName: String {
         switch self {
         case .largeTitle:
             return "largeTitle"
