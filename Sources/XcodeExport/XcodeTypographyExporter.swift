@@ -30,10 +30,13 @@ final public class XcodeTypographyExporter: XcodeExporterBase {
                 labelsDirectory: labelsDirectory,
                 separateStyles: output.urls.labels.labelStyleExtensionsURL != nil
             ))
-            
+        }
+
+        // UIKit Label Styles
+        if output.generateLabelStyles, let labelsDirectory = output.urls.labels.labelsDirectory {
             // LabelStyle.swift
             files.append(try makeLabelStyle(labelsDirectory: labelsDirectory))
-            
+
             // LabelStyle extensions
             if let url = output.urls.labels.labelStyleExtensionsURL {
                 files.append(try makeLabelStyleExtensionFileContents(

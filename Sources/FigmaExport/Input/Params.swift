@@ -111,6 +111,7 @@ struct Params: Decodable {
             let labelStyleSwift: URL?
             let swiftUIFontSwift: URL?
             let generateLabels: Bool
+            let generateLabelStyles: Bool
             let labelsDirectory: URL?
             let nameStyle: NameStyle
         }

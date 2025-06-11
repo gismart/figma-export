@@ -73,6 +73,7 @@ extension FigmaExportCommand {
             return XcodeTypographyOutput(
                 urls: urls,
                 generateLabels: iosParams.typography?.generateLabels,
+                generateLabelStyles: iosParams.typography?.generateLabelStyles,
                 addObjcAttribute: iosParams.addObjcAttribute,
                 templatesPath: iosParams.templatesPath
             )
